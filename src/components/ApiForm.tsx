@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMethodByName } from "@/utils/apiMethods";
 import { ApiResponse, callTelegramApi } from "@/services/telegramApi";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ApiFormProps {
   methodName: string;
@@ -18,11 +20,13 @@ interface ApiFormProps {
 const ApiForm = ({ methodName, botToken, onResponse }: ApiFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [paramValues, setParamValues] = useState<Record<string, string | number | boolean>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const method = getMethodByName(methodName);
 
   // Reset form when method changes
   useEffect(() => {
     setParamValues({});
+    setValidationErrors({});
   }, [methodName]);
 
   if (!method) {
@@ -34,6 +38,21 @@ const ApiForm = ({ methodName, botToken, onResponse }: ApiFormProps) => {
       </Card>
     );
   }
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    let isValid = true;
+
+    method.parameters.forEach(param => {
+      if (param.required && (!paramValues[param.name] || paramValues[param.name] === "")) {
+        errors[param.name] = "This field is required";
+        isValid = false;
+      }
+    });
+
+    setValidationErrors(errors);
+    return isValid;
+  };
 
   const handleInputChange = (name: string, value: string, type: string) => {
     let processedValue: string | number | boolean = value;
@@ -48,6 +67,15 @@ const ApiForm = ({ methodName, botToken, onResponse }: ApiFormProps) => {
       ...prev,
       [name]: processedValue
     }));
+
+    // Clear validation error if field is filled
+    if (value && validationErrors[name]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSwitchChange = (name: string, checked: boolean) => {
@@ -68,13 +96,20 @@ const ApiForm = ({ methodName, botToken, onResponse }: ApiFormProps) => {
       });
       return;
     }
+
+    if (!validateForm()) {
+      return;
+    }
     
     setIsLoading(true);
     
     try {
+      console.log(`Calling ${methodName} with params:`, paramValues);
       const response = await callTelegramApi(botToken, methodName, paramValues);
+      console.log(`${methodName} response:`, response);
       onResponse(response);
     } catch (error) {
+      console.error(`Error calling ${methodName}:`, error);
       onResponse({
         status: 500,
         error: error instanceof Error ? error.message : "Unknown error occurred",
@@ -93,6 +128,15 @@ const ApiForm = ({ methodName, botToken, onResponse }: ApiFormProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {Object.keys(validationErrors).length > 0 && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Please fix the validation errors before submitting
+              </AlertDescription>
+            </Alert>
+          )}
+          
           {method.parameters.map((param) => (
             <div key={param.name} className="space-y-1">
               <Label htmlFor={param.name} className="flex items-center">
@@ -111,23 +155,27 @@ const ApiForm = ({ methodName, botToken, onResponse }: ApiFormProps) => {
                     {paramValues[param.name] ? "True" : "False"}
                   </Label>
                 </div>
-              ) : param.type === "string" && param.name === "text" ? (
+              ) : param.type === "string" && param.name.includes("text") ? (
                 <Textarea
                   id={param.name}
-                  value={paramValues[param.name] as string || ""}
+                  value={(paramValues[param.name] as string) || ""}
                   onChange={(e) => handleInputChange(param.name, e.target.value, param.type)}
                   placeholder={param.placeholder}
-                  className="h-24"
+                  className={`h-24 ${validationErrors[param.name] ? "border-red-500" : ""}`}
                 />
               ) : (
                 <Input
                   id={param.name}
                   type={param.type === "number" ? "number" : "text"}
-                  value={paramValues[param.name] as string || ""}
+                  value={(paramValues[param.name] as string) || ""}
                   onChange={(e) => handleInputChange(param.name, e.target.value, param.type)}
                   placeholder={param.placeholder}
-                  required={param.required}
+                  className={validationErrors[param.name] ? "border-red-500" : ""}
                 />
+              )}
+              
+              {validationErrors[param.name] && (
+                <p className="text-xs text-red-500 mt-1">{validationErrors[param.name]}</p>
               )}
               
               <p className="text-xs text-gray-500">{param.description}</p>

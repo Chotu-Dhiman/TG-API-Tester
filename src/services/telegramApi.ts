@@ -10,6 +10,7 @@ export type ApiResponse = {
   description?: string;
   error?: string;
   timestamp: number;
+  requestDuration?: number;
 };
 
 export async function callTelegramApi(
@@ -49,12 +50,18 @@ export async function callTelegramApi(
     });
 
     const data = await response.json();
+    const endTime = Date.now();
+    const requestDuration = endTime - startTime;
     
-    // Return the response with status code and timestamp
+    // Make sure to capture and return the complete response
+    console.log("API Response:", data);
+    
+    // Return the response with status code, timestamp, and duration
     return {
       status: response.status,
       ...data,
       timestamp: startTime,
+      requestDuration,
     };
   } catch (error) {
     console.error("API call error:", error);

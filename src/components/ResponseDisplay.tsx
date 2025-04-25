@@ -1,10 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiResponse } from "@/services/telegramApi";
-import { Copy, ChevronUp, ChevronDown } from "lucide-react";
+import { Copy, ChevronUp, ChevronDown, Download } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ResponseDisplayProps {
   response: ApiResponse | null;
@@ -13,12 +14,15 @@ interface ResponseDisplayProps {
 const ResponseDisplay = ({ response }: ResponseDisplayProps) => {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>("formatted");
 
   if (!response) return null;
 
   const isSuccess = response.ok === true;
   const statusColor = isSuccess ? "text-green-500" : "text-red-500";
-  const executionTime = `Executed in ${Date.now() - response.timestamp}ms`;
+  const executionTime = response.requestDuration 
+    ? `Executed in ${response.requestDuration}ms` 
+    : `Executed in ${Date.now() - response.timestamp}ms`;
 
   // Function to format JSON with syntax highlighting
   const formatJSON = (json: any): string => {
@@ -28,13 +32,34 @@ const ResponseDisplay = ({ response }: ResponseDisplayProps) => {
     return JSON.stringify(json, null, 2);
   };
 
-  const formattedJson = formatJSON(response);
+  // Create a complete response object excluding internal properties
+  const completeResponse = { ...response };
+  delete completeResponse.timestamp; // Remove internal timestamp
+  delete completeResponse.requestDuration; // Remove internal duration
+  
+  const formattedJson = formatJSON(completeResponse);
 
   const handleCopyResponse = () => {
     navigator.clipboard.writeText(formattedJson);
     toast({
       title: "Copied to clipboard",
       description: "Response JSON has been copied",
+    });
+  };
+
+  const handleDownloadResponse = () => {
+    const blob = new Blob([formattedJson], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `telegram-api-${response.ok ? "success" : "error"}-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+      title: "Downloaded",
+      description: "Response JSON has been downloaded",
     });
   };
 
@@ -90,13 +115,35 @@ const ResponseDisplay = ({ response }: ResponseDisplayProps) => {
           >
             <Copy className="h-4 w-4 mr-1" /> Copy
           </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-2" 
+            onClick={handleDownloadResponse}
+          >
+            <Download className="h-4 w-4 mr-1" /> Download
+          </Button>
         </div>
       </CardHeader>
       {expanded && (
         <CardContent>
-          <div 
-            dangerouslySetInnerHTML={{ __html: renderHighlightedJSON(formattedJson) }} 
-          />
+          <Tabs defaultValue="formatted" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList>
+              <TabsTrigger value="formatted">Formatted</TabsTrigger>
+              <TabsTrigger value="raw">Raw</TabsTrigger>
+            </TabsList>
+            <TabsContent value="formatted" className="mt-2">
+              <div 
+                dangerouslySetInnerHTML={{ __html: renderHighlightedJSON(formattedJson) }} 
+                className="p-4 bg-gray-50 dark:bg-gray-900 rounded-md"
+              />
+            </TabsContent>
+            <TabsContent value="raw" className="mt-2">
+              <pre className="p-4 bg-gray-50 dark:bg-gray-900 rounded-md overflow-auto whitespace-pre-wrap break-words text-xs">
+                {formattedJson}
+              </pre>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       )}
     </Card>
