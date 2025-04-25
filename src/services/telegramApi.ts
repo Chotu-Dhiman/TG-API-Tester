@@ -36,6 +36,8 @@ export async function callTelegramApi(
   });
 
   const url = `https://api.telegram.org/bot${token}/${method}`;
+  
+  console.log(`Calling ${method} with params:`, cleanParams);
 
   try {
     // Start timestamp for measuring request duration

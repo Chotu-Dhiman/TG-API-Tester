@@ -44,7 +44,11 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
       </div>
 
       <div className="py-2">
-        <Accordion type="multiple" value={expandedCategories}>
+        <Accordion 
+          type="multiple" 
+          value={expandedCategories}
+          onValueChange={setExpandedCategories}
+        >
           {API_CATEGORIES.map((category) => (
             <AccordionItem value={category} key={category}>
               <AccordionTrigger className="px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700">

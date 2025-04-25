@@ -17,6 +17,7 @@ const Index = () => {
   const isMobile = useIsMobile();
 
   const handleMethodSelect = (methodName: string) => {
+    console.log("Method selected:", methodName);
     setSelectedMethod(methodName);
     setApiResponse(null);
     if (isMobile) {
