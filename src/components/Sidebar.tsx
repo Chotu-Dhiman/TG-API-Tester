@@ -1,11 +1,18 @@
-
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { API_CATEGORIES, getMethodsByCategory } from "@/utils/apiMethods";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Settings, MessageSquare, Users, Shield, Layout, FileText, Radio } from "lucide-react";
+import { 
+  MessageSquare, 
+  Users, 
+  Shield, 
+  Layout, 
+  Settings, 
+  FileText,
+  Radio
+} from "lucide-react";
 
 const getCategoryIcon = (category: string) => {
   switch (category) {
@@ -23,6 +30,25 @@ const getCategoryIcon = (category: string) => {
       return <FileText className="w-4 h-4" />;
     default:
       return <Radio className="w-4 h-4" />;
+  }
+};
+
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case "Basic":
+      return "hover:bg-blue-100 dark:hover:bg-blue-900/20";
+    case "Messages":
+      return "hover:bg-green-100 dark:hover:bg-green-900/20";
+    case "Members":
+      return "hover:bg-purple-100 dark:hover:bg-purple-900/20";
+    case "Admin":
+      return "hover:bg-red-100 dark:hover:bg-red-900/20";
+    case "Chat Management":
+      return "hover:bg-orange-100 dark:hover:bg-orange-900/20";
+    case "Media":
+      return "hover:bg-pink-100 dark:hover:bg-pink-900/20";
+    default:
+      return "hover:bg-gray-100 dark:hover:bg-gray-900/20";
   }
 };
 
@@ -51,7 +77,7 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
       )}
     >
       <div className="p-4 border-b bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-        <h2 className="font-semibold text-lg text-primary">API Methods</h2>
+        <h2 className="font-semibold text-lg text-primary">Telegram API Methods</h2>
         <p className="text-xs text-gray-500 mt-1">Select a method to test</p>
       </div>
 
@@ -63,7 +89,13 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
         >
           {API_CATEGORIES.map((category) => (
             <AccordionItem value={category} key={category}>
-              <AccordionTrigger className="px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+              <AccordionTrigger 
+                className={cn(
+                  "px-4 py-2 text-sm font-medium transition-colors",
+                  "hover:bg-gray-100 dark:hover:bg-gray-700",
+                  "flex items-center gap-2"
+                )}
+              >
                 {getCategoryIcon(category)}
                 {category}
               </AccordionTrigger>
@@ -76,7 +108,9 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
                       className={cn(
                         "w-full justify-start text-left text-sm py-1.5 h-auto",
                         "transition-all duration-200 ease-in-out",
-                        selectedMethod === method.name && "bg-primary/10 text-primary font-medium"
+                        getCategoryColor(category),
+                        selectedMethod === method.name && 
+                        "bg-primary/10 text-primary font-medium"
                       )}
                       onClick={() => onSelectMethod(method.name)}
                     >

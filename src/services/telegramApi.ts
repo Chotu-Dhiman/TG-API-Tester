@@ -1,4 +1,3 @@
-
 interface TelegramApiParams {
   [key: string]: string | number | boolean | undefined;
 }
@@ -31,7 +30,18 @@ export async function callTelegramApi(
   const cleanParams: TelegramApiParams = {};
   Object.keys(params).forEach(key => {
     if (params[key] !== undefined && params[key] !== "") {
-      cleanParams[key] = params[key];
+      // Handle JSON string parameters
+      if (typeof params[key] === 'string' && 
+          (params[key] as string).startsWith('[') && 
+          (params[key] as string).endsWith(']')) {
+        try {
+          cleanParams[key] = JSON.parse(params[key] as string);
+        } catch (e) {
+          cleanParams[key] = params[key];
+        }
+      } else {
+        cleanParams[key] = params[key];
+      }
     }
   });
 

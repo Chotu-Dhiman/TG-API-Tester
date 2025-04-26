@@ -711,5 +711,298 @@ const API_METHODS: ApiMethod[] = [
         placeholder: "Enter new description"
       }
     ]
+  },
+  {
+    name: "kickChatMember",
+    title: "Kick Chat Member",
+    category: "Admin",
+    description: "Kick a user from a group or a supergroup",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target group",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "user_id",
+        type: "number",
+        required: true,
+        description: "Unique identifier of the target user",
+        placeholder: "Enter user ID"
+      }
+    ]
+  },
+  {
+    name: "removeAllMembers",
+    title: "Remove All Members",
+    category: "Admin",
+    description: "Remove all members from a group (requires admin rights)",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target group",
+        placeholder: "Enter chat ID"
+      }
+    ]
+  },
+  {
+    name: "pinChatMessage",
+    title: "Pin Chat Message",
+    category: "Chat Management",
+    description: "Pin a message in a group, supergroup, or channel",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "message_id",
+        type: "number",
+        required: true,
+        description: "Identifier of a message to pin",
+        placeholder: "Enter message ID"
+      }
+    ]
+  },
+  {
+    name: "exportChatInviteLink",
+    title: "Export Chat Invite Link",
+    category: "Chat Management",
+    description: "Generate a new invite link for a chat",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      }
+    ]
+  },
+  {
+    name: "setChatPhoto",
+    title: "Set Chat Photo",
+    category: "Chat Management",
+    description: "Set a new profile photo for the chat",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "photo",
+        type: "string",
+        required: true,
+        description: "New chat photo (file_id or URL)",
+        placeholder: "Enter photo file_id or URL"
+      }
+    ]
+  },
+  {
+    name: "sendPoll",
+    title: "Send Poll",
+    category: "Messages",
+    description: "Send a native poll to a chat",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "question",
+        type: "string",
+        required: true,
+        description: "Poll question, 1-300 characters",
+        placeholder: "Enter poll question"
+      },
+      {
+        name: "options",
+        type: "string",
+        required: true,
+        description: "List of answer options, 2-10 items (JSON array)",
+        placeholder: '["Option 1", "Option 2"]'
+      }
+    ]
+  },
+  {
+    name: "sendLocation",
+    title: "Send Location",
+    category: "Messages",
+    description: "Send point on the map",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "latitude",
+        type: "number",
+        required: true,
+        description: "Latitude of the location",
+        placeholder: "Enter latitude"
+      },
+      {
+        name: "longitude",
+        type: "number",
+        required: true,
+        description: "Longitude of the location",
+        placeholder: "Enter longitude"
+      }
+    ]
+  },
+  {
+    name: "sendVenue",
+    title: "Send Venue",
+    category: "Messages",
+    description: "Send information about a venue",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "latitude",
+        type: "number",
+        required: true,
+        description: "Latitude of the venue",
+        placeholder: "Enter latitude"
+      },
+      {
+        name: "longitude",
+        type: "number",
+        required: true,
+        description: "Longitude of the venue",
+        placeholder: "Enter longitude"
+      },
+      {
+        name: "title",
+        type: "string",
+        required: true,
+        description: "Name of the venue",
+        placeholder: "Enter venue name"
+      },
+      {
+        name: "address",
+        type: "string",
+        required: true,
+        description: "Address of the venue",
+        placeholder: "Enter venue address"
+      }
+    ]
+  },
+  {
+    name: "sendContact",
+    title: "Send Contact",
+    category: "Messages",
+    description: "Send phone contacts",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "phone_number",
+        type: "string",
+        required: true,
+        description: "Contact's phone number",
+        placeholder: "Enter phone number"
+      },
+      {
+        name: "first_name",
+        type: "string",
+        required: true,
+        description: "Contact's first name",
+        placeholder: "Enter first name"
+      },
+      {
+        name: "last_name",
+        type: "string",
+        required: false,
+        description: "Contact's last name",
+        placeholder: "Enter last name"
+      }
+    ]
+  },
+  {
+    name: "sendDice",
+    title: "Send Dice",
+    category: "Messages",
+    description: "Send a dice message",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "emoji",
+        type: "string",
+        required: false,
+        description: "Emoji on which the dice throw animation is based",
+        placeholder: "🎲, 🎯, 🏀, ⚽, 🎳, or 🎰"
+      }
+    ]
+  },
+  {
+    name: "createChatInviteLink",
+    title: "Create Chat Invite Link",
+    category: "Chat Management",
+    description: "Create an additional invite link for a chat",
+    parameters: [
+      {
+        name: "chat_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the target chat",
+        placeholder: "Enter chat ID"
+      },
+      {
+        name: "name",
+        type: "string",
+        required: false,
+        description: "Invite link name",
+        placeholder: "Enter link name"
+      },
+      {
+        name: "expire_date",
+        type: "number",
+        required: false,
+        description: "Point in time when the link will expire",
+        placeholder: "Unix timestamp"
+      },
+      {
+        name: "member_limit",
+        type: "number",
+        required: false,
+        description: "Maximum number of users that can be members",
+        placeholder: "Enter member limit"
+      }
+    ]
   }
 ];
+
+export { API_METHODS };
