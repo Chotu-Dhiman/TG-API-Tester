@@ -1,5 +1,5 @@
 interface TelegramApiParams {
-  [key: string]: string | number | boolean | undefined;
+  [key: string]: string | number | boolean | object | undefined;
 }
 
 export type ApiResponse = {
@@ -26,17 +26,23 @@ export async function callTelegramApi(
     };
   }
 
-  // Remove undefined values from params
+  // Remove undefined values from params and handle complex params
   const cleanParams: TelegramApiParams = {};
   Object.keys(params).forEach(key => {
     if (params[key] !== undefined && params[key] !== "") {
       // Handle JSON string parameters
-      if (typeof params[key] === 'string' && 
-          (params[key] as string).startsWith('[') && 
-          (params[key] as string).endsWith(']')) {
-        try {
-          cleanParams[key] = JSON.parse(params[key] as string);
-        } catch (e) {
+      if (typeof params[key] === 'string') {
+        const strValue = params[key] as string;
+        if (
+          (strValue.startsWith('{') && strValue.endsWith('}')) || 
+          (strValue.startsWith('[') && strValue.endsWith(']'))
+        ) {
+          try {
+            cleanParams[key] = JSON.parse(strValue);
+          } catch (e) {
+            cleanParams[key] = params[key];
+          }
+        } else {
           cleanParams[key] = params[key];
         }
       } else {
@@ -53,13 +59,23 @@ export async function callTelegramApi(
     // Start timestamp for measuring request duration
     const startTime = Date.now();
     
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: Object.keys(cleanParams).length > 0 ? JSON.stringify(cleanParams) : undefined,
-    });
+    // Check if we need to upload files (not implemented in this version)
+    const hasFiles = false; // Placeholder for future file upload support
+    
+    let response;
+    if (!hasFiles) {
+      // Use JSON for non-file requests
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: Object.keys(cleanParams).length > 0 ? JSON.stringify(cleanParams) : undefined,
+      });
+    } else {
+      // This would be the place to implement file uploads in the future
+      throw new Error("File uploads not yet supported");
+    }
 
     const data = await response.json();
     const endTime = Date.now();
@@ -97,4 +113,20 @@ export async function testBotToken(token: string): Promise<boolean> {
   } catch (error) {
     return false;
   }
+}
+
+// Helper function to format parameters for webhook methods
+export function formatWebhookParams(params: TelegramApiParams): TelegramApiParams {
+  const formattedParams = {...params};
+  
+  // Handle allowed_updates array
+  if (typeof formattedParams.allowed_updates === 'string') {
+    try {
+      formattedParams.allowed_updates = JSON.parse(formattedParams.allowed_updates as string);
+    } catch (e) {
+      // If parsing fails, keep as string
+    }
+  }
+  
+  return formattedParams;
 }

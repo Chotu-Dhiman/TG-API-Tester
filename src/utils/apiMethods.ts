@@ -7,6 +7,9 @@ export const API_CATEGORIES = [
   "Members",
   "Advanced",
   "Webhooks",
+  "Games",
+  "Payments",
+  "Stickers"
 ];
 
 interface ApiMethod {
@@ -1110,61 +1113,4 @@ const API_METHODS: ApiMethod[] = [
   },
   {
     name: "getChatMenuButton",
-    title: "Get Chat Menu Button",
-    category: "Advanced",
-    description: "Get the current value of the bot's menu button.",
-    parameters: []
-  },
-  {
-    name: "setMyCommands",
-    title: "Set Bot Commands",
-    category: "Advanced",
-    description: "Change the list of bot's commands.",
-    parameters: [
-      {
-        name: "commands",
-        type: "string",
-        required: true,
-        description: "List of bot commands",
-        placeholder: '[{"command":"start", "description":"Start the bot"}]'
-      },
-      {
-        name: "scope",
-        type: "string",
-        required: false,
-        description: "JSON object of command scope",
-        placeholder: '{"type": "default"}'
-      }
-    ]
-  },
-  {
-    name: "getMyCommands",
-    title: "Get Bot Commands",
-    category: "Advanced",
-    description: "Get the current list of bot's commands.",
-    parameters: []
-  },
-  {
-    name: "setMyDefaultAdministratorRights",
-    title: "Set Default Admin Rights",
-    category: "Advanced",
-    description: "Set default administrator rights for the bot.",
-    parameters: [
-      {
-        name: "rights",
-        type: "string",
-        required: true,
-        description: "JSON object of admin rights",
-        placeholder: '{"can_manage_chat": true}'
-      },
-      {
-        name: "for_channels",
-        type: "boolean",
-        required: false,
-        description: "Pass true to change rights in channels"
-      }
-    ]
-  }
-];
-
-export { API_METHODS };
+    title: "

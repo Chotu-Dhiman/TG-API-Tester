@@ -1,9 +1,12 @@
+
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { API_CATEGORIES, getMethodsByCategory } from "@/utils/apiMethods";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { 
   MessageSquare, 
   Users, 
@@ -94,12 +97,51 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
   const isMobile = useIsMobile();
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState(API_CATEGORIES);
   
   useEffect(() => {
     if (API_CATEGORIES.includes("Basic")) {
       setExpandedCategories(["Basic"]);
     }
   }, []);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredCategories(API_CATEGORIES);
+      return;
+    }
+
+    const termLower = searchTerm.toLowerCase();
+    const categoriesWithMatchingMethods = API_CATEGORIES.filter(category => {
+      const methods = getMethodsByCategory(category);
+      return methods.some(method => 
+        method.name.toLowerCase().includes(termLower) || 
+        method.title.toLowerCase().includes(termLower) ||
+        method.description.toLowerCase().includes(termLower)
+      );
+    });
+    
+    setFilteredCategories(categoriesWithMatchingMethods);
+    
+    // Auto-expand categories with matching methods
+    if (categoriesWithMatchingMethods.length > 0 && searchTerm.length > 2) {
+      setExpandedCategories(categoriesWithMatchingMethods);
+    }
+  }, [searchTerm]);
+
+  const getFilteredMethods = (category: string) => {
+    if (searchTerm === "") {
+      return getMethodsByCategory(category);
+    }
+
+    const termLower = searchTerm.toLowerCase();
+    return getMethodsByCategory(category).filter(method => 
+      method.name.toLowerCase().includes(termLower) || 
+      method.title.toLowerCase().includes(termLower) ||
+      method.description.toLowerCase().includes(termLower)
+    );
+  };
 
   return (
     <div 
@@ -112,6 +154,30 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
       <div className="p-4 border-b bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
         <h2 className="font-semibold text-lg text-primary">Telegram API Methods</h2>
         <p className="text-xs text-gray-500 mt-1">Select a method to test</p>
+        
+        <div className="relative mt-3">
+          <Input
+            className="pl-8"
+            placeholder="Search methods..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+          {searchTerm && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="absolute right-1 top-1 h-6 w-6 p-0" 
+              onClick={() => setSearchTerm("")}
+            >
+              <span className="sr-only">Clear</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="py-2">
@@ -120,44 +186,67 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
           value={expandedCategories}
           onValueChange={setExpandedCategories}
         >
-          {API_CATEGORIES.map((category) => (
-            <AccordionItem value={category} key={category}>
-              <AccordionTrigger 
-                className={cn(
-                  "px-4 py-2 text-sm font-medium transition-colors",
-                  "hover:bg-gray-100 dark:hover:bg-gray-700",
-                  "flex items-center gap-2",
-                  getCategoryHeaderColor(category)
-                )}
-              >
-                {getCategoryIcon(category)}
-                {category}
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="pl-2">
-                  {getMethodsByCategory(category).map((method) => (
-                    <Button
-                      key={method.name}
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start text-left text-sm py-1.5 h-auto",
-                        "transition-all duration-200 ease-in-out",
-                        getCategoryColor(category),
-                        selectedMethod === method.name && [
-                          "bg-primary/10 text-primary font-medium",
-                          getCategoryHeaderColor(category)
-                        ]
-                      )}
-                      onClick={() => onSelectMethod(method.name)}
-                    >
-                      {method.title}
-                    </Button>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+          {filteredCategories.map((category) => {
+            const methods = getFilteredMethods(category);
+            if (methods.length === 0) return null;
+            
+            return (
+              <AccordionItem value={category} key={category}>
+                <AccordionTrigger 
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium transition-colors",
+                    "hover:bg-gray-100 dark:hover:bg-gray-700",
+                    "flex items-center gap-2",
+                    getCategoryHeaderColor(category)
+                  )}
+                >
+                  {getCategoryIcon(category)}
+                  {category}
+                  <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
+                    {methods.length}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="pl-2">
+                    {methods.map((method) => (
+                      <Button
+                        key={method.name}
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start text-left text-sm py-1.5 h-auto",
+                          "transition-all duration-200 ease-in-out",
+                          getCategoryColor(category),
+                          selectedMethod === method.name && [
+                            "bg-primary/10 text-primary font-medium",
+                            getCategoryHeaderColor(category)
+                          ],
+                          searchTerm && method.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
+                            "ring-1 ring-primary/30"
+                        )}
+                        onClick={() => onSelectMethod(method.name)}
+                      >
+                        {method.title}
+                      </Button>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
         </Accordion>
+        
+        {filteredCategories.length === 0 && (
+          <div className="px-4 py-6 text-center">
+            <p className="text-sm text-gray-500">No methods match "{searchTerm}"</p>
+            <Button 
+              variant="link" 
+              onClick={() => setSearchTerm("")}
+              className="mt-2"
+            >
+              Clear search
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
