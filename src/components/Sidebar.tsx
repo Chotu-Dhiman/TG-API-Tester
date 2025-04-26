@@ -11,7 +11,9 @@ import {
   Layout, 
   Settings, 
   FileText,
-  Radio
+  Radio,
+  Webhook,
+  Cog
 } from "lucide-react";
 
 const getCategoryIcon = (category: string) => {
@@ -28,6 +30,10 @@ const getCategoryIcon = (category: string) => {
       return <Settings className="w-4 h-4" />;
     case "Media":
       return <FileText className="w-4 h-4" />;
+    case "Webhooks":
+      return <Webhook className="w-4 h-4" />;
+    case "Advanced":
+      return <Cog className="w-4 h-4" />;
     default:
       return <Radio className="w-4 h-4" />;
   }
@@ -47,8 +53,35 @@ const getCategoryColor = (category: string) => {
       return "hover:bg-orange-100 dark:hover:bg-orange-900/20";
     case "Media":
       return "hover:bg-pink-100 dark:hover:bg-pink-900/20";
+    case "Webhooks":
+      return "hover:bg-indigo-100 dark:hover:bg-indigo-900/20";
+    case "Advanced":
+      return "hover:bg-cyan-100 dark:hover:bg-cyan-900/20";
     default:
       return "hover:bg-gray-100 dark:hover:bg-gray-900/20";
+  }
+};
+
+const getCategoryHeaderColor = (category: string) => {
+  switch (category) {
+    case "Basic":
+      return "text-blue-600 dark:text-blue-400";
+    case "Messages":
+      return "text-green-600 dark:text-green-400";
+    case "Members":
+      return "text-purple-600 dark:text-purple-400";
+    case "Admin":
+      return "text-red-600 dark:text-red-400";
+    case "Chat Management":
+      return "text-orange-600 dark:text-orange-400";
+    case "Media":
+      return "text-pink-600 dark:text-pink-400";
+    case "Webhooks":
+      return "text-indigo-600 dark:text-indigo-400";
+    case "Advanced":
+      return "text-cyan-600 dark:text-cyan-400";
+    default:
+      return "text-gray-600 dark:text-gray-400";
   }
 };
 
@@ -93,7 +126,8 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
                 className={cn(
                   "px-4 py-2 text-sm font-medium transition-colors",
                   "hover:bg-gray-100 dark:hover:bg-gray-700",
-                  "flex items-center gap-2"
+                  "flex items-center gap-2",
+                  getCategoryHeaderColor(category)
                 )}
               >
                 {getCategoryIcon(category)}
@@ -109,8 +143,10 @@ const Sidebar = ({ isOpen, selectedMethod, onSelectMethod }: SidebarProps) => {
                         "w-full justify-start text-left text-sm py-1.5 h-auto",
                         "transition-all duration-200 ease-in-out",
                         getCategoryColor(category),
-                        selectedMethod === method.name && 
-                        "bg-primary/10 text-primary font-medium"
+                        selectedMethod === method.name && [
+                          "bg-primary/10 text-primary font-medium",
+                          getCategoryHeaderColor(category)
+                        ]
                       )}
                       onClick={() => onSelectMethod(method.name)}
                     >

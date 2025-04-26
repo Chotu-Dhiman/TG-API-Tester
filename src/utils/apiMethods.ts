@@ -6,6 +6,7 @@ export const API_CATEGORIES = [
   "Admin",
   "Members",
   "Advanced",
+  "Webhooks",
 ];
 
 interface ApiMethod {
@@ -1000,6 +1001,167 @@ const API_METHODS: ApiMethod[] = [
         required: false,
         description: "Maximum number of users that can be members",
         placeholder: "Enter member limit"
+      }
+    ]
+  },
+
+  // Webhook Methods
+  {
+    name: "setWebhook",
+    title: "Set Webhook",
+    category: "Webhooks",
+    description: "Specify a URL to receive incoming updates via webhook.",
+    parameters: [
+      {
+        name: "url",
+        type: "string",
+        required: true,
+        description: "HTTPS URL to send updates to",
+        placeholder: "Enter webhook URL (https://)"
+      },
+      {
+        name: "certificate",
+        type: "string",
+        required: false,
+        description: "Public key certificate",
+        placeholder: "Upload public key certificate"
+      },
+      {
+        name: "max_connections",
+        type: "number",
+        required: false,
+        description: "Maximum allowed number of simultaneous HTTPS connections",
+        placeholder: "Enter max connections (1-100)"
+      },
+      {
+        name: "allowed_updates",
+        type: "string",
+        required: false,
+        description: "List of update types to receive",
+        placeholder: '["message", "edited_channel_post", "callback_query"]'
+      }
+    ]
+  },
+  {
+    name: "deleteWebhook",
+    title: "Delete Webhook",
+    category: "Webhooks",
+    description: "Remove webhook integration.",
+    parameters: [
+      {
+        name: "drop_pending_updates",
+        type: "boolean",
+        required: false,
+        description: "Pass True to drop all pending updates"
+      }
+    ]
+  },
+  {
+    name: "getWebhookInfo",
+    title: "Get Webhook Info",
+    category: "Webhooks",
+    description: "Get current webhook status.",
+    parameters: []
+  },
+
+  // Advanced API Methods
+  {
+    name: "answerCallbackQuery",
+    title: "Answer Callback Query",
+    category: "Advanced",
+    description: "Send answers to callback queries from inline keyboards.",
+    parameters: [
+      {
+        name: "callback_query_id",
+        type: "string",
+        required: true,
+        description: "Unique identifier for the query to be answered",
+        placeholder: "Enter callback query ID"
+      },
+      {
+        name: "text",
+        type: "string",
+        required: false,
+        description: "Text of the notification (0-200 characters)",
+        placeholder: "Enter notification text"
+      },
+      {
+        name: "show_alert",
+        type: "boolean",
+        required: false,
+        description: "Show as alert instead of notification"
+      }
+    ]
+  },
+  {
+    name: "setChatMenuButton",
+    title: "Set Chat Menu Button",
+    category: "Advanced",
+    description: "Change bot's menu button in private chats.",
+    parameters: [
+      {
+        name: "menu_button",
+        type: "string",
+        required: true,
+        description: "JSON object for the bot's new menu button",
+        placeholder: '{"type": "default"}'
+      }
+    ]
+  },
+  {
+    name: "getChatMenuButton",
+    title: "Get Chat Menu Button",
+    category: "Advanced",
+    description: "Get the current value of the bot's menu button.",
+    parameters: []
+  },
+  {
+    name: "setMyCommands",
+    title: "Set Bot Commands",
+    category: "Advanced",
+    description: "Change the list of bot's commands.",
+    parameters: [
+      {
+        name: "commands",
+        type: "string",
+        required: true,
+        description: "List of bot commands",
+        placeholder: '[{"command":"start", "description":"Start the bot"}]'
+      },
+      {
+        name: "scope",
+        type: "string",
+        required: false,
+        description: "JSON object of command scope",
+        placeholder: '{"type": "default"}'
+      }
+    ]
+  },
+  {
+    name: "getMyCommands",
+    title: "Get Bot Commands",
+    category: "Advanced",
+    description: "Get the current list of bot's commands.",
+    parameters: []
+  },
+  {
+    name: "setMyDefaultAdministratorRights",
+    title: "Set Default Admin Rights",
+    category: "Advanced",
+    description: "Set default administrator rights for the bot.",
+    parameters: [
+      {
+        name: "rights",
+        type: "string",
+        required: true,
+        description: "JSON object of admin rights",
+        placeholder: '{"can_manage_chat": true}'
+      },
+      {
+        name: "for_channels",
+        type: "boolean",
+        required: false,
+        description: "Pass true to change rights in channels"
       }
     ]
   }
