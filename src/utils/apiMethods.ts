@@ -1113,4 +1113,9 @@ const API_METHODS: ApiMethod[] = [
   },
   {
     name: "getChatMenuButton",
-    title: "
+    title: "Get Chat Menu Button",
+    category: "Advanced",
+    description: "Get information about the menu button set for private chats with the bot.",
+    parameters: []
+  }
+];
